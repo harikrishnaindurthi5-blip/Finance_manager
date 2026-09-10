@@ -2,7 +2,7 @@
 
 A command-line personal finance management application built with Python.
 
-This project was created to practice and demonstrate core Python concepts including **Object-Oriented Programming (OOP), file handling, exception handling, custom exceptions, lists, dictionaries, loops, functions, and basic data persistence**.
+This project was created to practice and demonstrate core Python concepts including **Object-Oriented Programming (OOP), file handling, exception handling, custom exceptions, lists, dictionaries, loops, functions, and JSON data persistence**.
 
 ## Features
 
@@ -19,8 +19,8 @@ This project was created to practice and demonstrate core Python concepts includ
 * Calculate total expenses
 * Calculate current balance
 * Calculate totals by category
-* Save transactions to a text file
-* Load previously saved transactions when the application starts
+* Automatically save transactions to a JSON file
+* Automatically load previously saved transactions when the application starts
 * Validate transaction types and amounts
 * Handle invalid user input
 * Handle missing transaction IDs with custom exceptions
@@ -34,6 +34,7 @@ This project was created to practice and demonstrate core Python concepts includ
 * Dictionaries
 * Functions
 * File Handling
+* JSON
 * Exception Handling
 * Custom Exceptions
 
@@ -41,6 +42,7 @@ This project was created to practice and demonstrate core Python concepts includ
 
 ```text
 personal_finance_manager/
+
 │
 ├── main.py
 ├── models.py
@@ -51,7 +53,7 @@ personal_finance_manager/
 ├── .gitignore
 │
 └── data/
-    └── transactions.txt
+    └── transactions.json
 ```
 
 ## File Responsibilities
@@ -96,7 +98,8 @@ The `FinanceManager` class handles:
 * Calculating expenses
 * Calculating balance
 * Calculating category totals
-* Saving and loading transactions
+* Saving transactions
+* Loading transactions
 
 ### `file_handler.py`
 
@@ -105,20 +108,30 @@ Responsible only for reading and writing transaction data.
 Transactions are stored in:
 
 ```text
-data/transactions.txt
+data/transactions.json
 ```
 
-The file uses the following format:
-
-```text
-ID | Type | Amount | Category | Description
-```
+The transaction data is stored as JSON.
 
 Example:
 
-```text
-1 | expense | 25.5 | Food | Lunch
-2 | income | 100000.0 | Salary | Monthly salary
+```json
+[
+    {
+        "id": 1,
+        "type": "expense",
+        "amount": 25.5,
+        "category": "food",
+        "description": "lunch"
+    },
+    {
+        "id": 2,
+        "type": "income",
+        "amount": 100000.0,
+        "category": "salary",
+        "description": "monthly salary"
+    }
+]
 ```
 
 ### `exceptions.py`
@@ -133,7 +146,7 @@ These exceptions allow the application to handle specific application errors sep
 
 ## How It Works
 
-When the application starts, the `FinanceManager` loads previously saved transactions from the data file.
+When the application starts, the `FinanceManager` loads previously saved transactions from the JSON file.
 
 When a new transaction is added:
 
@@ -145,13 +158,50 @@ When a new transaction is added:
 6. A unique transaction ID is generated.
 7. A `Transaction` object is created.
 8. The transaction is added to the list.
+9. The updated transaction list is automatically saved to the JSON file.
 
-When the user saves:
+When a transaction is deleted:
 
-1. The current transaction list is passed to `FileHandler`.
-2. The existing file is opened in write mode.
-3. The current transactions are written back to the file.
-4. The latest application state is therefore persisted.
+1. The user enters the transaction ID.
+2. The manager finds the transaction.
+3. The transaction is removed from the list.
+4. The updated transaction list is automatically saved to the JSON file.
+
+The user does not need to manually save the application.
+
+## JSON Persistence
+
+The application uses JSON to preserve transaction data between program runs.
+
+When saving:
+
+```text
+Transaction objects
+        ↓
+__dict__
+        ↓
+Python dictionaries
+        ↓
+json.dump()
+        ↓
+transactions.json
+```
+
+When loading:
+
+```text
+transactions.json
+        ↓
+json.load()
+        ↓
+Python dictionaries
+        ↓
+Transaction objects
+        ↓
+transactions list
+```
+
+This allows the application to close and restart without losing previously saved transactions.
 
 ## Transaction IDs
 
@@ -252,8 +302,7 @@ The application will display a menu:
 6. Get Total Expenses
 7. Get Balance
 8. Get Category Totals
-9. Save Transactions
-10. Exit
+9. Exit
 ```
 
 ## Example
@@ -262,6 +311,7 @@ Adding an expense:
 
 ```text
 Choose what you want to do:
+
 1. Add Transaction
 2. View Transactions
 ...
@@ -269,25 +319,31 @@ Choose what you want to do:
 ::1
 
 Choose which type of Transaction you would like to Enter(Income/Expense):
+
 expense
 
 Enter the Amount:
+
 25.50
 
 Enter the category:
+
 Food
 
 Enter the Description:
+
 Lunch
 
 Transaction Successfully added
 ```
 
-The transaction is stored in memory and can then be saved to:
+The transaction is automatically saved to:
 
 ```text
-data/transactions.txt
+data/transactions.json
 ```
+
+No manual save is required.
 
 ## Testing
 
@@ -310,17 +366,18 @@ The application was manually tested for:
 * Deleting existing transactions
 * Deleting nonexistent transactions
 * Invalid transaction IDs
-* Saving transactions
-* Saving multiple times without creating duplicates
+* Automatically saving newly added transactions
+* Automatically saving deleted transactions
 * Restarting the application and loading saved transactions
-* Deleting a transaction, saving, restarting, and verifying that the deletion persisted
-* Generating new transaction IDs after restarting the application
+* Generating new transaction IDs after restarting
+* Confirming transactions are preserved after restarting
+* Confirming deleted transactions remain deleted after restarting
 
 ## What I Practiced
 
 This project helped me apply several Python concepts together instead of practicing them individually.
 
-### Python fundamentals
+### Python Fundamentals
 
 * Variables
 * Strings
@@ -349,6 +406,14 @@ This project helped me apply several Python concepts together instead of practic
 * File modes
 * Saving and loading application data
 
+### JSON
+
+* `json.dump()`
+* `json.load()`
+* Converting objects to dictionaries
+* Converting dictionaries back into objects
+* JSON data persistence
+
 ### Error Handling
 
 * `try`
@@ -371,7 +436,7 @@ Transaction Model
       ↓
 File Handler
       ↓
-transactions.txt
+transactions.json
 ```
 
 ## Future Improvements
@@ -380,7 +445,6 @@ This is Version 1 of the project.
 
 Possible future improvements include:
 
-* Replace text-file storage with JSON
 * Add stronger data validation
 * Add Pydantic models
 * Add a database
@@ -390,9 +454,12 @@ Possible future improvements include:
 * Add budgeting features
 * Add a web or mobile interface
 * Add automated tests
+* Add AI-powered financial insights
 
-These features are intentionally outside the scope of Version 1.
+These features are intentionally outside the current scope of Version 1.
 
-## Author ---- Harikrishna Indurthi
+## Author
+
+**Harikrishna Indurthi**
 
 Built as a Python learning and portfolio project while progressing toward backend development, APIs, and AI/GenAI application development.

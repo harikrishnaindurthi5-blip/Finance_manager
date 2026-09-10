@@ -10,7 +10,7 @@ class FinanceManager:
     
     def __init__(self):
         self.transactions = []
-        self.file_handler = FileHandler("data/transactions.txt")
+        self.file_handler = FileHandler("data/transactions.json")
         self.load_transactions()
                 
     def add_transaction(self, user_choice, Amount, category, Description):
@@ -31,7 +31,7 @@ class FinanceManager:
              id = 1
             transaction = Transaction(id, user_choice, Amount, category, Description)
             self.transactions.append(transaction)
-    
+            self.save_transactions()
          
                 
     def view_transactions(self):
@@ -52,11 +52,12 @@ class FinanceManager:
                 if delete_input == transaction.id:
                  found = True
                  self.transactions.remove(transaction)
+                 self.save_transactions()
                  print("Transaction deleted successfully!")
                  break
             if not found:
                 raise TransactionNotFoundError ("No transactions found for this ID")
-                          
+                     
             
             
     def search_transactions(self):

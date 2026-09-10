@@ -15,3 +15,4 @@ env/
 
 # Personal finance data
 data/transactions.txt
+data/transactions.json

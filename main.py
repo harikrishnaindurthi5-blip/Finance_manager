@@ -21,8 +21,8 @@ while True:
         print(f"Error: {it}")
      except InvalidAmountError as ia:
         print(f"Error: {ia}")
-     except ValueError:
-        print("Please enter a valid number.")
+     except ValueError as e:
+        print(f"Error: {e}")
         
         
         
